@@ -163,3 +163,7 @@ class InvalidCertificateException(TlsException):
 
 class Timeout(TcpException):
     pass
+
+
+class NonGlobalAddressException(TcpException):
+    pass

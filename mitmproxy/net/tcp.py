@@ -6,6 +6,7 @@ import threading
 import time
 import traceback
 import binascii
+from ipaddress import ip_address
 from ssl import match_hostname
 from ssl import CertificateError
 
@@ -666,7 +667,11 @@ class TCPClient(_Connection):
         err = None
         for res in socket.getaddrinfo(self.address[0], self.address[1], 0, socket.SOCK_STREAM):
             af, socktype, proto, canonname, sa = res
-            sock = None
+
+            host = sa[0]
+            if not ip_address(host).is_global:
+                raise exceptions.NonGlobalAddressException("The address %s is not a global address" % host)
+
             try:
                 sock = self.makesocket(af, socktype, proto)
                 if timeout:

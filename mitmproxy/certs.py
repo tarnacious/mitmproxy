@@ -4,6 +4,7 @@ import time
 import datetime
 import ipaddress
 import sys
+from pathlib import Path
 
 from pyasn1.type import univ, constraint, char, namedtype, tag
 from pyasn1.codec.der.decoder import decode
@@ -269,8 +270,13 @@ class CertStore:
             p12.set_privatekey(key)
             f.write(p12.export())
 
-        with open(os.path.join(path, basename + "-dhparam.pem"), "wb") as f:
-            f.write(DEFAULT_DHPARAM)
+
+        # Write dh parameters if they don't exist.
+        dh_param_path = os.path.join(path, basename + "-dhparam.pem")
+        dh_param_file = Path(dh_param_path)
+        if not dh_param_file.is_file():
+            with open(dh_param_path, "wb") as f:
+                f.write(DEFAULT_DHPARAM)
 
         return key, ca
 

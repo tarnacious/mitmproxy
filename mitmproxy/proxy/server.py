@@ -119,6 +119,13 @@ class ConnectionHandler:
             root_layer = self._create_root_layer()
             root_layer = self.channel.ask("clientconnect", root_layer)
             root_layer()
+        except exceptions.NonGlobalAddressException as e:
+            self.log(e.message, "info")
+            try:
+                error_response = http.make_error_response(502, e.message)
+                self.client_conn.send(http1.assemble_response(error_response))
+            except exceptions.TcpException:
+                pass
         except exceptions.Kill:
             self.log("Connection killed", "info")
         except exceptions.ProtocolException as e:
